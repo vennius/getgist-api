@@ -1,22 +1,7 @@
 const express = require("express")
 const axios = require("axios")
 const app = express()
-const mongoose = require('mongoose');
 require('dotenv').config()
-
-main().catch(err => console.log(err));
-
-async function main() {
-  await mongoose.connect(process.env.MONGO_URL);
-}
-
-const serverSchema = new mongoose.Schema({
-  ip: String,
-  port: String,
-  name: String
-})
-
-const Server = mongoose.model('Server', serverSchema);
 
 app.get("/getgist/:id", async (req, res) => {
   try {
@@ -33,25 +18,6 @@ app.get("/getgist/:id", async (req, res) => {
     }
   } catch (error) {
     res.send("Error")
-  }
-
-})
-
-app.get("/addserver", async (req, res) => {
-  try {
-    const { ip, port, name } = req.query
-    if(!(ip && port && name)) throw "Data gak lengkap!"
-    const newServer = new Server({ ip, port, name })
-    await newServer.save()
-    res.json({
-      status: "oke"
-    })
-  } catch (error) {
-    console.log(error)
-    res.json({
-      status: "error",
-      error
-    })
   }
 
 })
