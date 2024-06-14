@@ -2,7 +2,6 @@ const express = require("express")
 const axios = require("axios")
 const app = express()
 require('dotenv').config()
-// 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
 app.get("/getgist/:id", async (req, res) => {
   
   const response = await axios({
