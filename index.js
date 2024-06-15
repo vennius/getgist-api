@@ -27,7 +27,8 @@ app.get("/getgist/:id", async (req, res) => {
 app.post("/send", async (req, res) => {
   try{
     if(!req.query.data) throw "Data query not found!"
-    const data = req.query.data.replace("[SPASI]", " ").replace("[ENTER]", "\n")
+    let data = req.query.data.replace(/\[SPASI\]/g, " ");
+    data = data.replace(/\[ENTER\]/g, "\n");
     await tele.sendMessage(process.env.SENDTO_ID, data)
     res.json({
       status: "oke"
