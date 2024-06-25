@@ -9,14 +9,14 @@ const tele = new Telegram(process.env.BOT_TOKEN)
 app.get("/getgist/:id", async (req, res) => {
   try {
     const response = await axios({
-    method: "GET",
-    url: "https://api.github.com/gists/"+req.params.id,
-    headers: {
-      "Authorization": "Bearer "+process.env.TOKEN
-    },
-    responseType: "json"
-     })
-    for(key in response.data.files){
+      method: "GET",
+      url: "https://api.github.com/gists/" + req.params.id,
+      headers: {
+        "Authorization": "Bearer " + process.env.TOKEN
+      },
+      responseType: "json"
+    })
+    for (key in response.data.files) {
       res.send(response.data.files[key].content)
     }
   } catch (error) {
@@ -25,15 +25,17 @@ app.get("/getgist/:id", async (req, res) => {
 })
 
 app.post("/send", async (req, res) => {
-  try{
-    if(!req.query.data) throw "Data query not found!"
+  try {
+    if (!req.query.data) throw "Data query not found!"
     let data = req.query.data.replace(/\[SPASI\]/g, " ");
     data = data.replace(/\[ENTER\]/g, "\n");
+    data = data.replace(/\[HASHTAG\]/g, "#");
+    data = data.replace(/\[AND\]/g, "&");
     await tele.sendMessage(process.env.SENDTO_ID, data)
     res.json({
       status: "oke"
     })
-  }catch(error){
+  } catch (error) {
     res.json({
       status: "error",
       error
