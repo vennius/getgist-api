@@ -50,6 +50,9 @@ app.post("/send", async (req, res) => {
     data = data.replace(/\[AND\]/g, "&");
     data = data.split("\n")
     data = data.map(el => el.split(">")[1])
+    if (data[0] !== "51.79.162.211(7777)") return res.response({
+      status: "not lunar"
+    })
     const embed = new EmbedBuilder()
       .setColor(0xFFFF00)
       .setTitle(data[1])
@@ -62,7 +65,7 @@ app.post("/send", async (req, res) => {
       .setFooter({ text: "Copyright get-gist api" })
     await sendDM(process.env.OWNER_ID, { embeds: [embed] })
     res.json({
-      status: "oke"
+      status: "lunar"
     })
   } catch (error) {
     res.json({
