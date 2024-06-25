@@ -29,8 +29,6 @@ app.post("/send", async (req, res) => {
     if (!req.query.data) throw "Data query not found!"
     let data = req.query.data.replace(/\[SPASI\]/g, " ");
     data = data.replace(/\[ENTER\]/g, "\n");
-    data = data.replace(/\[HASHTAG\]/g, "#");
-    data = data.replace(/\[AND\]/g, "&");
     await tele.sendMessage(process.env.SENDTO_ID, data)
     res.json({
       status: "oke"
